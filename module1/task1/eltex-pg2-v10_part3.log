@@ -1,12 +1,64 @@
 mkdir -p D1/D2/D3
+ls -ld D1 D1/D2 D1/D2/D3
+#drwxr-xr-x 3 eltex-pg2-v10 eltex-pg2-v10 4096 Oct 30 18:16 D1
+#drwxr-xr-x 3 eltex-pg2-v10 eltex-pg2-v10 4096 Oct 30 18:16 D1/D2
+#drwxr-xr-x 2 eltex-pg2-v10 eltex-pg2-v10 4096 Oct 30 18:16 D1/D2/D3
 touch D1/D2/file.txt
+ls -l D1/D2/file.txt
+#-rw-r--r-- 1 eltex-pg2-v10 eltex-pg2-v10 0 Oct 30 18:17 D1/D2/file.txt
 ln -s /home/eltex-pg2-v10/D1/D2/file.txt softlink.txt
 ln /home/eltex-pg2-v10/D1/D2/file.txt hardlink.txt
-ls -ali
+ls -li D1/D2/file.txt D1/D2/D3/file_symlink D1/D2/D3/file_hardlink
+#655577 -rw-r--r-- 2 eltex-pg2-v10 eltex-pg2-v10 10 Oct 30 18:17 D1/D2/D3/file_hardlink
+#655578 lrwxrwxrwx 1 eltex-pg2-v10 eltex-pg2-v10 11 Oct 30 18:18 D1/D2/D3/file_symlink -> ../file.txt
+#655577 -rw-r--r-- 2 eltex-pg2-v10 eltex-pg2-v10 10 Oct 30 18:17 D1/D2/file.txt
 mv file.txt /home/eltex-pg2-v10/D1
-rm -r D2
-find / -type f -size +50M 2>/dev/null
-find ~ -type f -mtime -1
-which find
-file /usr/bin/find
+ls -l D1/file.txt D1/D2/D3/file_symlink D1/D2/D3/file_hardlink
+#-rw-r--r-- 2 eltex-pg2-v10 eltex-pg2-v10 10 Oct 30 18:17 D1/D2/D3/file_hardlink
+#lrwxrwxrwx 1 eltex-pg2-v10 eltex-pg2-v10 11 Oct 30 18:18 D1/D2/D3/file_symlink -> ../file.txt
+#-rw-r--r-- 2 eltex-pg2-v10 eltex-pg2-v10 10 Oct 30 18:17 D1/file.txt
+cat D1/D2/D3/file_hardlink
+#adasdasda
+cat D1/D2/D3/file_symlink
+#cat: D1/D2/D3/file_symlink: No such file or directory
+rm -rf D1/D2
+GTLOG="$HOME/${USER}_part3_gt20M.log"
+eltex-pg2-v10@eltex-2026-autumn:~$ find / -type f -size +20M -exec du -h {} + 2>/dev/null > "$GTLOG"
+cat "$GTLOG"
+#31M	/usr/bin/x86_64-linux-gnu-lto-dump-12
+#31M	/usr/lib/gcc/x86_64-linux-gnu/12/lto1
+#32M	/usr/lib/gcc/x86_64-linux-gnu/12/cc1
+#30M	/usr/lib/x86_64-linux-gnu/libicudata.so.72
+#33M	/boot/initrd.img-6.1.0-44-amd64
+#33M	/boot/initrd.img-6.1.0-50-amd64
+#33M	/boot/initrd.img-6.1.0-53-amd64
+#41M	/var/log/journal/8247b53b6ae84ae0ad9bb1c96113fd29/system@4f44ef78d53d4cd0a5555898b8d0015b-0000000000179b0c-000659e0105337c7.journal
+#25M	/var/log/journal/8247b53b6ae84ae0ad9bb1c96113fd29/system@00065be42e22b64e-29e46ef12bfd5644.journal~
+#33M	/var/log/journal/8247b53b6ae84ae0ad9bb1c96113fd29/system@00065b6e0461a953-e594878e03ffcfa9.journal~
+#25M	/var/log/journal/8247b53b6ae84ae0ad9bb1c96113fd29/system@00065c4bf168df91-94a074e01b8fde49.journal~
+#39M	/var/cache/apt/srcpkgcache.bin
+#39M	/var/cache/apt/pkgcache.bin
+#48M	/var/lib/apt/lists/deb.debian.org_debian_dists_bookworm_main_binary-amd64_Packages
+#49M	/var/lib/apt/lists/deb.debian.org_debian_dists_bookworm_main_source_Sources
+#32M	/var/lib/apt/lists/deb.debian.org_debian_dists_bookworm_main_i18n_Translation-en
+find "$HOME" -type f -mtime -1 -printf '%TY-%Tm-%Td %TH:%TM %p\n'
+#2026-10-30 17:36 /home/eltex-pg2-v10/.viminfo
+#2026-10-30 18:23 /home/eltex-pg2-v10/eltex-pg2-v10_part3_gt20M.log
+#2026-10-30 18:17 /home/eltex-pg2-v10/D1/file.txt
+#2026-10-30 18:05 /home/eltex-pg2-v10/.bash_history
+#2026-10-30 17:57 /home/eltex-pg2-v10/.bashrc
+type -a find
+#find is /usr/bin/find
+#find is /bin/find
+command -v find
+#/usr/bin/find
+file "$(command -v find)"
+#/usr/bin/find: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=5545a6c7162d325fbe5ffabcbfe4e5521b66ce70, for GNU/Linux 3.2.0, stripped
+ls -l /boot/initrd.img*
+#-rw-r--r-- 1 root root 34206128 Mar 26  2026 /boot/initrd.img-6.1.0-44-amd64
+#-rw-r--r-- 1 root root 34207930 Jul  6 03:14 /boot/initrd.img-6.1.0-50-amd64
+#-rw-r--r-- 1 root root 34215974 Oct  7 15:44 /boot/initrd.img-6.1.0-53-amd64
 file /boot/initrd.img*
+#/boot/initrd.img-6.1.0-44-amd64: ASCII cpio archive (SVR4 with no CRC)
+#/boot/initrd.img-6.1.0-50-amd64: ASCII cpio archive (SVR4 with no CRC)
+#/boot/initrd.img-6.1.0-53-amd64: ASCII cpio archive (SVR4 with no CRC)
