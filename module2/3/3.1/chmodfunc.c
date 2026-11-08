@@ -1,0 +1,159 @@
+#include <string.h>
+#include "chmod.h"
+
+void IntToBin(int num, char *binary_int) {
+    char buffer[9];
+    for (int i = 0; i < 3; i++)
+    {
+        int digit = num % 10;
+        for (int j = 0; j < 3; j++) {
+            buffer[2 - j + i * 3] = (digit & (1 << j)) ? '1' : '0';
+        }
+        num /= 10;
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        binary_int[i] = buffer[6 + i];
+        binary_int[3 + i] = buffer[3 + i];
+        binary_int[6 + i] = buffer[i];
+    }
+    binary_int[9] = '\0';
+}
+
+void CharToBin(const char *perm, char *binary_ch) {
+    const char *rwx = "rwx";
+    for (int i = 0; i < 9; i++)
+    {
+        if (strchr(rwx, perm[i])) {
+            binary_ch[i] = '1';
+        } else {
+            binary_ch[i] = '0';
+        }
+    }
+    binary_ch[9] = '\0';
+}
+
+void PermToString(mode_t mode, char *permission) {
+    permission[0] = (mode & S_IRUSR) ? 'r' : '-';
+    permission[1] = (mode & S_IWUSR) ? 'w' : '-';
+    permission[2] = (mode & S_IXUSR) ? 'x' : '-';
+    permission[3] = (mode & S_IRGRP) ? 'r' : '-';
+    permission[4] = (mode & S_IWGRP) ? 'w' : '-';
+    permission[5] = (mode & S_IXGRP) ? 'x' : '-';
+    permission[6] = (mode & S_IROTH) ? 'r' : '-';
+    permission[7] = (mode & S_IWOTH) ? 'w' : '-';
+    permission[8] = (mode & S_IXOTH) ? 'x' : '-';
+    permission[9] = '\0';
+}
+
+void PermToBin(mode_t mode, char *permission) {
+    permission[0] = (mode & S_IRUSR) ? '1' : '0';
+    permission[1] = (mode & S_IWUSR) ? '1' : '0';
+    permission[2] = (mode & S_IXUSR) ? '1' : '0';
+    permission[3] = (mode & S_IRGRP) ? '1' : '0';
+    permission[4] = (mode & S_IWGRP) ? '1' : '0';
+    permission[5] = (mode & S_IXGRP) ? '1' : '0';
+    permission[6] = (mode & S_IROTH) ? '1' : '0';
+    permission[7] = (mode & S_IWOTH) ? '1' : '0';
+    permission[8] = (mode & S_IXOTH) ? '1' : '0';
+    permission[9] = '\0';
+}
+
+int PermToInt(mode_t mode)
+{
+    int user = (((mode & S_IRUSR) ? 4 : 0) + ((mode & S_IWUSR) ? 2 : 0) + ((mode & S_IXUSR) ? 1 : 0)) * 100;
+    int group = ((((mode & S_IRGRP) ? 4 : 0) + ((mode & S_IWGRP) ? 2 : 0) + ((mode & S_IXGRP) ? 1 : 0)) * 10);
+    int other = ((mode & S_IROTH) ? 4 : 0) + ((mode & S_IWOTH) ? 2 : 0) + ((mode & S_IXOTH) ? 1 : 0);
+    return user + group + other;
+}
+
+mode_t ModifyPerm(mode_t mode, const char *command) {
+    if (command[1] == '+') {
+        if (command[0] == 'u' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode |= S_IRUSR; break;
+                    case 'w': mode |= S_IWUSR; break;
+                    case 'x': mode |= S_IXUSR; break;
+                }
+            }
+        }
+        if (command[0] == 'g' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode |= S_IRGRP; break;
+                    case 'w': mode |= S_IWGRP; break;
+                    case 'x': mode |= S_IXGRP; break;
+                }
+            }
+        }
+        if (command[0] == 'o' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode |= S_IROTH; break;
+                    case 'w': mode |= S_IWOTH; break;
+                    case 'x': mode |= S_IXOTH; break;
+                }
+            }
+        }
+    }
+    else if (command[1] == '-') {
+        if (command[0] == 'u' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode &= ~S_IRUSR; break;
+                    case 'w': mode &= ~S_IWUSR; break;
+                    case 'x': mode &= ~S_IXUSR; break;
+                }
+            }
+        }
+        if (command[0] == 'g' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode &= ~S_IRGRP; break;
+                    case 'w': mode &= ~S_IWGRP; break;
+                    case 'x': mode &= ~S_IXGRP; break;
+                }
+            }
+        }
+        if (command[0] == 'o' || command[0] == 'a') {
+            for (int i = 2; command[i]; i++) {
+                switch (command[i]) {
+                    case 'r': mode &= ~S_IROTH; break;
+                    case 'w': mode &= ~S_IWOTH; break;
+                    case 'x': mode &= ~S_IXOTH; break;
+                }
+            }
+        }
+    }
+ /*       else if (command[1] == '='){
+            if (command[0] == 'u' || command[0] == 'a'){
+                for (int i = 2; command[i]; i++){
+                    switch (command[i]){
+                        case 'r': mode = S_IRUSR; break;
+                        case 'w': mode = S_IWUSR; break;
+                        case 'x': mode = S_IXUSR; break;
+                    }
+                }
+            }
+            if (command[0] == 'g' || command[0] == 'a'){
+                for (int i = 2; command[i]; i++){
+                    switch (command[i]){
+                        case 'r': mode = S_IRGRP; break;
+                        case 'w': mode = S_IWGRP; break;
+                        case 'x': mode = S_IXGRP; break;
+                    }
+                }
+            }
+            if (command[0] == 'o' || command[0] == 'a'){
+                for (int i = 2; command[i]; i++){
+                    switch (command[i]){
+                        case 'r': mode = S_IROTH; break;
+                        case 'w': mode = S_IWOTH; break;
+                        case 'x': mode = S_IXOTH; break;
+                    }
+                }
+            }
+        } */
+    return mode;
+}
