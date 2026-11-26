@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -O2
 
-all: task3_chat
+all: chat
 
-task3_chat: task3_chat.c
+chat: chat.c
 	$(CC) $(CFLAGS) -o $@ $< -lrt $(LDFLAGS)
 
 clean:
-	rm -f task2_broker task3_chat
+	rm -f chat
 
 .PHONY: all clean

@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -D_DEFAULT_SOURCE -std=c11 -Wall -Wextra -Wpedantic -O2
 
-all: task5_posix
+all: posix
 
-task5_posix: task5_posix.c
+posix: posix.c
 	$(CC) $(CFLAGS) -o $@ $< -pthread -lrt
 
 clean:
-	rm -f task5_posix
+	rm -f posix
 
 .PHONY: all clean

@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -D_DEFAULT_SOURCE -std=c11 -Wall -Wextra -Wpedantic -O2
 
-all: task6_udp
+all: udp
 
-task6_udp: task6_udp.c
+udp: udp.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f task6_udp
+	rm -f udp
 
 .PHONY: all clean
